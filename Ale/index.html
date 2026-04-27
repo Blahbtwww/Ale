@@ -222,6 +222,43 @@
       100% { opacity: 0; transform: translate3d(var(--x4), var(--y4), 150px) scale(1.1); }
     }
 
+    .fade-in {
+      opacity: 0;
+      filter: blur(12px);
+      transform: scale(0.95);
+      animation: aparecerSuave 2.5s ease forwards;
+    }
+    
+    @keyframes aparecerSuave {
+      0% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: scale(0.95);
+      }
+      60% {
+        opacity: 1;
+        filter: blur(3px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+      }
+    }
+
+    .titulo {
+      opacity: 0;
+      filter: blur(12px);
+      transform: scale(0.95);
+      transition: all 1.8s ease;
+    }
+    
+    .titulo.mostrar {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+
   </style>
 </head>
 
@@ -460,6 +497,9 @@
         setInterval(crearFrase, 1800);
     
       }, 800); // ⏱ tiempo de la animación
+      setTimeout(() => {
+        document.querySelector(".titulo").classList.add("mostrar");
+    }, 2500);
     });
 
     function crearFrase() {
