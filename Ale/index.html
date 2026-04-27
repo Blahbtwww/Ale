@@ -161,9 +161,59 @@
       white-space: pre-line;
     }
 
+    .frase-flotante {
+      position: absolute;
+      color: #ffd7e4;
+      font-size: clamp(12px, 1.2vw, 18px);
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+    
+      text-shadow:
+        0 0 6px #ff75aa,
+        0 0 15px #ff4f8f;
+    
+      animation: flotar 6s linear forwards;
+    }
+    
+    @keyframes flotar {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+      }
+      20% {
+        opacity: 0.7;
+      }
+      80% {
+        opacity: 0.7;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-40px) scale(1.05);
+      }
+    }
+
     .letra.activa {
       opacity: 1;
       transform: translateY(0) scale(1);
+    }
+
+    .estrella {
+      position: fixed;
+      width: 3px;
+      height: 3px;
+      background: #ffd7e4;
+      border-radius: 50%;
+      opacity: 0.6;
+      box-shadow: 0 0 8px #ff75aa, 0 0 15px #ff4f8f;
+      animation: brillar 3s infinite ease-in-out;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    @keyframes brillar {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 0.9; transform: scale(1.4); }
     }
 
     @keyframes avanzar {
@@ -171,6 +221,7 @@
       50% { opacity: 1; }
       100% { opacity: 0; transform: translate3d(var(--x4), var(--y4), 150px) scale(1.1); }
     }
+
   </style>
 </head>
 
@@ -254,6 +305,7 @@
 
     let contextoAudio, analizador, fuente, datos;
     let yaInicio = false;
+    let ultimoBeat = 0;
 
     const letras = [
       { tiempo: 1.80, texto: "날 스치는 그대의 옅은 그 목소리\n(Nal seuchineun geudaeui yeoteun geu moksori)" },
@@ -320,6 +372,44 @@
       { tiempo: 233.5, texto: "" }
     ];
 
+    const frases = [
+  // Español
+  "Eres linda",
+  "Eres muy divertida",
+  "Eres increíblemente increíble",
+  "Siempre estaré para ti",
+  "Tu risa es muy linda",
+  "Tu presencia es inigualable",
+  "Gracias por existir",
+  "Gracias por todo",
+  "Te quiero mucho Natt",
+  "Tus ojos son muy lindos",
+
+  // Inglés
+  "You are beautiful",
+  "You are so fun",
+  "You are amazing",
+  "I will always be there for you",
+  "Your smile is lovely",
+  "Your presence is unmatched",
+  "Thank you for existing",
+  "Thank you for everything",
+  "I love you so much Natt",
+  "Your eyes are very beautiful",
+
+  // Coreano
+  "너는 정말 예뻐",
+  "너는 정말 재미있어",
+  "너는 정말 대단해",
+  "항상 네 곁에 있을게",
+  "너의 웃음은 정말 예뻐",
+  "너의 존재는 특별해",
+  "태어나줘서 고마워",
+  "모든 것에 감사해",
+  "나트 정말 많이 사랑해",
+  "너의 눈은 정말 예뻐"
+];
+
     let indice = -1;
 
     const sobre = document.getElementById("sobre");
@@ -366,9 +456,55 @@
     
         animarConMusica();
         actualizarLetra();
+        crearEstrellas();
+        setInterval(crearFrase, 1800);
     
       }, 800); // ⏱ tiempo de la animación
     });
+
+    function crearFrase() {
+      const frase = document.createElement("div");
+      frase.className = "frase-flotante";
+    
+      const texto = frases[Math.floor(Math.random() * frases.length)];
+      frase.textContent = texto;
+    
+      if (
+        texto.includes("Natt") ||
+        texto.includes("ojos") ||
+        texto.includes("eyes") ||
+        texto.includes("눈")
+      ) {
+        frase.style.fontSize = "22px";
+        frase.style.opacity = "0.9";
+        frase.style.textShadow = "0 0 12px #ff4f8f, 0 0 30px #ff2f7f";
+      }
+
+      frase.style.left = Math.random() * 90 + "vw";
+      frase.style.top = Math.random() * 90 + "vh";
+    
+      document.body.appendChild(frase); // si ya lo tienes, déjalo
+
+      setTimeout(() => {
+        frase.remove();
+      }, 6000);
+    
+    } // 👈 ESTA LLAVE ES LA CLAVE
+    
+    
+    // 👇 AHORA SÍ, FUERA
+    function crearEstrellas() {
+      for (let i = 0; i < 45; i++) {
+        const estrella = document.createElement("div");
+        estrella.className = "estrella";
+    
+        estrella.style.left = Math.random() * 100 + "vw";
+        estrella.style.top = Math.random() * 100 + "vh";
+        estrella.style.animationDelay = Math.random() * 3 + "s";
+    
+        document.body.appendChild(estrella);
+      }
+    }
 
     function animarConMusica() {
       requestAnimationFrame(animarConMusica);
@@ -379,6 +515,10 @@
       for (let i = 0; i < datos.length; i++) suma += datos[i];
 
       const intensidad = (suma / datos.length) / 255;
+      if (intensidad > 0.18 && Date.now() - ultimoBeat > 1200) {
+        crearFrase();
+        ultimoBeat = Date.now();
+      }
 
       corazonElemento.style.transform = `rotateX(10deg) scale(${1 + intensidad * 0.12})`;
       corazonElemento.style.filter = `brightness(${1 + intensidad * 0.8})`;
